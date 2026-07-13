@@ -77,10 +77,10 @@ function buildHistosFileTable(){
 
       var thisODBhostBackend = dataStore.ODBhostBackend;
 
-      var URLStringViewer = 'https://griffincollaboration.github.io/SpectrumViewer/spectrumViewer2.html?backend='+dataStore.spectrumServerBackend+'&port='+dataStore.spectrumServerPort+'&histoDir='+dataStore.histoFileDirectoryPath+'&histoFile='+dataStore.histoFileList[num];
-      var URLString2DViewer = 'https://griffincollaboration.github.io/SpectrumViewer/2dSpectrumTool.html?backend='+dataStore.spectrumServerBackend+'&port='+dataStore.spectrumServerPort+'&histoDir='+dataStore.histoFileDirectoryPath+'&histoFile='+dataStore.histoFileList[num];
-      var URLStringGainMatcher = 'https://griffincollaboration.github.io/SpectrumViewer/gainMatcher.html?analyzerBackend='+dataStore.spectrumServerBackend+'&analyzerPort='+dataStore.spectrumServerPort+'&ODBHostBackend='+thisODBhostBackend+'&ODBHostPort='+dataStore.ODBhostPort+'&histoDir='+dataStore.histoFileDirectoryPath+'&histoFile='+dataStore.histoFileList[num];
-      var URLStringAnalysisOverview = 'https://griffincollaboration.github.io/SpectrumViewer/analysisOverview.html?analyzerBackend='+dataStore.spectrumServerBackend+'&analyzerPort='+dataStore.spectrumServerPort+'&histoDir='+dataStore.histoFileDirectoryPath+'&histoFile='+dataStore.histoFileList[num];
+      var URLStringViewer = 'http://localhost:9000/spectrumViewer2.html?backend='+dataStore.spectrumServerBackend+'&port='+dataStore.spectrumServerPort+'&histoDir='+dataStore.histoFileDirectoryPath+'&histoFile='+dataStore.histoFileList[num];
+      var URLString2DViewer = 'http://localhost:9000/2dSpectrumTool.html?backend='+dataStore.spectrumServerBackend+'&port='+dataStore.spectrumServerPort+'&histoDir='+dataStore.histoFileDirectoryPath+'&histoFile='+dataStore.histoFileList[num];
+      var URLStringGainMatcher = 'http://localhost:9000/gainMatcher.html?analyzerBackend='+dataStore.spectrumServerBackend+'&analyzerPort='+dataStore.spectrumServerPort+'&ODBHostBackend='+thisODBhostBackend+'&ODBHostPort='+dataStore.ODBhostPort+'&histoDir='+dataStore.histoFileDirectoryPath+'&histoFile='+dataStore.histoFileList[num];
+      var URLStringAnalysisOverview = 'http://localhost:9000/analysisOverview.html?analyzerBackend='+dataStore.spectrumServerBackend+'&analyzerPort='+dataStore.spectrumServerPort+'&histoDir='+dataStore.histoFileDirectoryPath+'&histoFile='+dataStore.histoFileList[num];
 
       cell1.innerHTML = '<a href=\"'+URLString2DViewer+'\" target=\"_blank\">'+dataStore.histoFileList[num]+'</a>';
       cell1.value = dataStore.histoFileList[num].split(".")[0];  // Used to easily add the run title when available later
