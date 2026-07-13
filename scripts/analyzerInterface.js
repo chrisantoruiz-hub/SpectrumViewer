@@ -48,7 +48,7 @@ function setupDataStore(){
     dataStore.ODBhostPort = '8081';   // mhttpd server
 
     // Sorting Status variables
-    dataStore.midasFileDataDirectoryPath = '';                // [added in processConfigFile()] initial data directory path
+    dataStore.midasFileDataDirectoryPath = '/Users/chris/Work/grif-replay';                // [added in processConfigFile()] initial data directory path
     //  dataStore.midasFileDataDirectoryPath = "/tig/grifstore1/grifalt/schedule146/Calibrations_June2024";                // [added in processConfigFile()] initial data directory path
 
     dataStore.midasFileList = { "Names" : [], "Sizes" : [], "Titles" : []};  // place to store the list of midas files available to sort which is provided by the server
@@ -83,7 +83,7 @@ function setupDataStore(){
 
     // Gating and Histogram variables
     //  dataStore.configFileDataDirectoryPath = "/home/grifstor/daq/analyzer/grif-replay";                                 // [added in processConfigFile()] initial config file directory path
-    dataStore.configFileDataDirectoryPath = '';                                 // [added in processConfigFile()] initial config file directory path
+    dataStore.configFileDataDirectoryPath = '/Users/chris/Work/grif-replay';                                 // [added in processConfigFile()] initial config file directory path
     dataStore.configFileTimestamp = 0;               // Timestamp recorded at the most recent request for the config file (viewConfig)
     dataStore.Configs = {};                          // place to park Config file information
     dataStore.globalCondition = {                   // place to park Global condition info on the dataStore
