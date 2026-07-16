@@ -77,8 +77,8 @@ function buildHistosFileTable(){
 
       var thisODBhostBackend = dataStore.ODBhostBackend;
 
-      var URLStringViewer = 'http://localhost:9000/spectrumViewer2.html?backend='+dataStore.spectrumServerBackend+'&port='+dataStore.spectrumServerPort+'&histoDir='+dataStore.histoFileDirectoryPath+'&histoFile='+dataStore.histoFileList[num];
-      var URLString2DViewer = 'http://localhost:9000/2dSpectrumTool.html?backend='+dataStore.spectrumServerBackend+'&port='+dataStore.spectrumServerPort+'&histoDir='+dataStore.histoFileDirectoryPath+'&histoFile='+dataStore.histoFileList[num];
+      var URLStringViewer = 'http://localhost:8080/spectrumViewer2.html?backend='+dataStore.spectrumServerBackend+'&port='+dataStore.spectrumServerPort+'&histoDir='+dataStore.histoFileDirectoryPath+'&histoFile='+dataStore.histoFileList[num];
+      var URLString2DViewer = 'http://localhost:8080/2dSpectrumTool.html?backend='+dataStore.spectrumServerBackend+'&port='+dataStore.spectrumServerPort+'&histoDir='+dataStore.histoFileDirectoryPath+'&histoFile='+dataStore.histoFileList[num];
       var URLStringGainMatcher = 'http://localhost:9000/gainMatcher.html?analyzerBackend='+dataStore.spectrumServerBackend+'&analyzerPort='+dataStore.spectrumServerPort+'&ODBHostBackend='+thisODBhostBackend+'&ODBHostPort='+dataStore.ODBhostPort+'&histoDir='+dataStore.histoFileDirectoryPath+'&histoFile='+dataStore.histoFileList[num];
       var URLStringAnalysisOverview = 'http://localhost:9000/analysisOverview.html?analyzerBackend='+dataStore.spectrumServerBackend+'&analyzerPort='+dataStore.spectrumServerPort+'&histoDir='+dataStore.histoFileDirectoryPath+'&histoFile='+dataStore.histoFileList[num];
 
