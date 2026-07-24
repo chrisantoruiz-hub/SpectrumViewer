@@ -289,6 +289,13 @@ document.getElementById('showXprojZoomed').onclick = function(){
   var Xmax = dataStore.hm.currentXaxisMaxValue;
   var Ymin = dataStore.hm.currentYaxisMinValue;
   var Ymax = dataStore.hm.currentYaxisMaxValue;
+  // After initial draw currentXaxis/YaxisMaxValue = last bin index (not exclusive edge).
+  // After a zoom it IS the exclusive edge. Normalize to exclusive so the projection
+  // loop (j < gateMaxX) covers the full visible range in both states.
+  var xEnd = dataStore.hm.xglobalEnd;
+  var yEnd = dataStore.hm.yglobalEnd;
+  if(xEnd && Xmax >= xEnd - 1) Xmax = xEnd;
+  if(yEnd && Ymax >= yEnd - 1) Ymax = yEnd;
   plotName = projectXY(Xmin,Xmax,Ymin,Ymax,'x');
 
   // Send an event to plot the new 1d projection histogram in the default 1d viewer
@@ -311,6 +318,11 @@ document.getElementById('showYprojZoomed').onclick = function(){
   var Xmax = dataStore.hm.currentXaxisMaxValue;
   var Ymin = dataStore.hm.currentYaxisMinValue;
   var Ymax = dataStore.hm.currentYaxisMaxValue;
+  // Normalize to exclusive upper bound (same off-by-one fix as showXprojZoomed).
+  var xEnd = dataStore.hm.xglobalEnd;
+  var yEnd = dataStore.hm.yglobalEnd;
+  if(xEnd && Xmax >= xEnd - 1) Xmax = xEnd;
+  if(yEnd && Ymax >= yEnd - 1) Ymax = yEnd;
   plotName = projectXY(Xmin,Xmax,Ymin,Ymax,'y');
 
   // Plot the 1d histogram projection

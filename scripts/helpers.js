@@ -4013,7 +4013,7 @@ function projectYaxis(gateMin,gateMax,type,parentPlotname){
   // If no limits for the gate/projection are provided then make a total projection
   if(gateMin == undefined || gateMin<1) gateMin = 0;
   if(gateMax == undefined){
-    gateMax = dataStore.hm._raw[0].length-1;
+    gateMax = dataStore.hm._raw[0].length; // exclusive upper bound for slice()
     // Set name for total projection
     thisProjectionName = dataStore.activeMatrix+'y';
   }else{
@@ -4062,10 +4062,10 @@ function projectXY(gateMinX,gateMaxX,gateMinY,gateMaxY,axis){
   if(gateMinX == undefined || gateMinX<1) gateMinX = 0;
   if(gateMinY == undefined || gateMinY<1) gateMinY = 0;
   if(gateMaxX == undefined){
-    gateMaxX = dataStore.hm._raw.length-1;
+    gateMaxX = dataStore.hm._raw[0].length; // X dimension (exclusive upper bound)
   }
   if(gateMaxY == undefined){
-    gateMaxY = dataStore.hm._raw[0].length-1;
+    gateMaxY = dataStore.hm._raw.length; // Y dimension (exclusive upper bound)
   }
   gateMinX = Number(gateMinX);
   gateMaxX = Number(gateMaxX);
