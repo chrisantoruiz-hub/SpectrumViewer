@@ -65,6 +65,7 @@ function spectrumViewer(canvasID){
 
 	//data
 	this.plotBuffer = {}; //buffer holding all the spectra we have on hand, packed as 'name':data[], where data[i] = counts in channel i
+	this.spectrumXmin = {}; //per-spectrum xmin offset: physical x value corresponding to bin 0
 	this.baselines = {}; //as plotBuffer, but these arrays are subtracted from the corresponding entries in plotBuffer before plotting.
 	this.fakeData = {};
 	this.fakeData.energydata0 = [200,48,42,48,58,57,59,72,85,68,61,60,72,147,263,367,512,499,431,314,147,78,35,22,13,9,16,7,10,13,5,5,3,1,2,4,0,1,1,1,0,1,0,1,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,111,200,80,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,40,80,120,70,20,20,20,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,300,650,200,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
@@ -344,43 +345,45 @@ function spectrumViewer(canvasID){
 			}
 
 			// Loop through the data spectrum that we have
+			var xOff = this.spectrumXmin[thisSpec] || 0;
 			histLine = new createjs.Shape();
 			histLine.graphics.ss(this.axisLineWidth).s(color);
 			//histLine.graphics.mt(this.leftMargin, this.canvas.height - this.bottomMargin);
 			for(i=Math.floor(this.XaxisLimitMin); i<Math.floor(this.XaxisLimitMax); i++){
+				var binIdx = i - xOff;
 				//determine the subtractions of baseline and backgrounds; subtractions if initialized as all bins of 0
-				binSubtractions = subtractions[thisSpec][i];
+				binSubtractions = (binIdx >= 0 && binIdx < subtractions[thisSpec].length) ? subtractions[thisSpec][binIdx] : 0;
 
 				// Protection at the end of the spectrum (minimum and maximum X)
 				if(i<this.XaxisLimitMin || i>this.XaxisLimitMax) continue;
 
 				// Protection in Overlay mode for spectra which are shorter (in x) than the longest spectrum overlayed.
-				if(i==this.plotBuffer[thisSpec].length){
+				if(binIdx==this.plotBuffer[thisSpec].length){
 					//left side of bar
 					histLine.graphics.lt( this.leftMargin + (i-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin );
-				} else if(i<this.plotBuffer[thisSpec].length){
+				} else if(binIdx >= 0 && binIdx<this.plotBuffer[thisSpec].length){
 
 					if(this.AxisType==0){
 						//draw canvas line:
 						//left side of bar
 						if(i != Math.floor(this.XaxisLimitMin))
-						histLine.graphics.lt( this.leftMargin + (i-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin - Math.max(0,(this.plotBuffer[thisSpec][i] - binSubtractions - this.YaxisLimitMin))*this.countHeight );
+						histLine.graphics.lt( this.leftMargin + (i-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin - Math.max(0,(this.plotBuffer[thisSpec][binIdx] - binSubtractions - this.YaxisLimitMin))*this.countHeight );
 						else
-						histLine.graphics.mt( this.leftMargin + (i-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin - Math.max(0,(this.plotBuffer[thisSpec][i] - binSubtractions - this.YaxisLimitMin))*this.countHeight );
+						histLine.graphics.mt( this.leftMargin + (i-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin - Math.max(0,(this.plotBuffer[thisSpec][binIdx] - binSubtractions - this.YaxisLimitMin))*this.countHeight );
 						//top of bar
-						histLine.graphics.lt( this.leftMargin + (i+1-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin - Math.max(0,(this.plotBuffer[thisSpec][i] - binSubtractions - this.YaxisLimitMin))*this.countHeight );
+						histLine.graphics.lt( this.leftMargin + (i+1-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin - Math.max(0,(this.plotBuffer[thisSpec][binIdx] - binSubtractions - this.YaxisLimitMin))*this.countHeight );
 					}
 
 					if(this.AxisType==1){
 						//draw canvas line:
-						if(this.plotBuffer[thisSpec][i] - binSubtractions > 0){
+						if(this.plotBuffer[thisSpec][binIdx] - binSubtractions > 0){
 							//left side of bar
 							if( i != Math.floor(this.XaxisLimitMin))
-							histLine.graphics.lt( this.leftMargin + (i-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin - Math.max(0, (Math.log10(this.plotBuffer[thisSpec][i] - binSubtractions) - Math.log10(this.YaxisLimitMin)))*this.countHeight );
+							histLine.graphics.lt( this.leftMargin + (i-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin - Math.max(0, (Math.log10(this.plotBuffer[thisSpec][binIdx] - binSubtractions) - Math.log10(this.YaxisLimitMin)))*this.countHeight );
 							else
-							histLine.graphics.mt( this.leftMargin + (i-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin - Math.max(0, (Math.log10(this.plotBuffer[thisSpec][i] - binSubtractions) - Math.log10(this.YaxisLimitMin)))*this.countHeight );
+							histLine.graphics.mt( this.leftMargin + (i-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin - Math.max(0, (Math.log10(this.plotBuffer[thisSpec][binIdx] - binSubtractions) - Math.log10(this.YaxisLimitMin)))*this.countHeight );
 							//top of bar
-							histLine.graphics.lt( this.leftMargin + (i+1-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin - Math.max(0, (Math.log10(this.plotBuffer[thisSpec][i] - binSubtractions) - Math.log10(this.YaxisLimitMin)))*this.countHeight );
+							histLine.graphics.lt( this.leftMargin + (i+1-this.XaxisLimitMin)*this.binWidth, this.canvas.height - this.bottomMargin - Math.max(0, (Math.log10(this.plotBuffer[thisSpec][binIdx] - binSubtractions) - Math.log10(this.YaxisLimitMin)))*this.countHeight );
 						} else {
 							//drop to the x axis
 							if( i != Math.floor(this.XaxisLimitMin) )
@@ -516,9 +519,11 @@ function spectrumViewer(canvasID){
 		this.XaxisLimitMin += step;
 		this.XaxisLimitMax += step;
 
-		if(this.XaxisLimitMin < 0){
-			this.XaxisLimitMin = 0;
-			this.XaxisLimitMax = windowSize;
+		var globalXmin = 0;
+		for(var s in this.plotBuffer){ globalXmin = Math.min(globalXmin, this.spectrumXmin[s] || 0); }
+		if(this.XaxisLimitMin < globalXmin){
+			this.XaxisLimitMin = globalXmin;
+			this.XaxisLimitMax = globalXmin + windowSize;
 		}
 
 		if(this.XaxisLimitMax > this.XaxisLimitAbsMax){
@@ -533,22 +538,21 @@ function spectrumViewer(canvasID){
 
 	//recalculate x axis limits, for use when plots are deleted or hidden
 	this.adjustXaxis = function(){
-		this.XaxisLimitMin = (typeof this.demandXmin === 'number') ? this.demandXmin : 0;
-		//use override max is present
+		var thisSpec, overallXmin = 0, computedMax = 0, hasSpectra = false;
+		for(thisSpec in this.plotBuffer){
+			if(this.hideSpectrum[thisSpec]) continue;
+			hasSpectra = true;
+			var xOff = this.spectrumXmin[thisSpec] || 0;
+			overallXmin = Math.min(overallXmin, xOff);
+			computedMax = Math.max(computedMax, xOff + this.plotBuffer[thisSpec].length);
+		}
+		this.XaxisLimitAbsMax = hasSpectra ? computedMax : 2048;
+		this.XaxisLimitMin = (typeof this.demandXmin === 'number') ? this.demandXmin : overallXmin;
 		if(typeof this.demandXmax === 'number'){
 			this.XaxisLimitAbsMax = this.demandXmax;
 			this.XaxisLimitMax = this.demandXmax;
 			this.chooseLimitsCallback();
 			return;
-		}
-		//autodetect max otherwise
-		this.XaxisLimitAbsMax = 2048;
-		for(thisSpec in this.plotBuffer){
-			//skip hidden spectra
-			if(this.hideSpectrum[thisSpec]) continue;
-
-			//Find the maximum X value from the size of the data
-			this.XaxisLimitAbsMax = Math.max(this.XaxisLimitAbsMax, this.plotBuffer[thisSpec].length);
 		}
 		this.XaxisLimitMax = this.XaxisLimitAbsMax;
 		this.chooseLimitsCallback();
@@ -565,24 +569,27 @@ function spectrumViewer(canvasID){
 		this.XaxisLength = this.XaxisLimitMax - this.XaxisLimitMin;
 
 		minYvalue = 1000000;
-		this.XaxisLimitAbsMax = 2048;
+		this.XaxisLimitAbsMax = 0;
 		maxYvalue=this.YaxisLimitMax;
 		// Loop through to get the data and set the Y axis limits
 		for(thisSpec in this.plotBuffer){
 			//skip hidden spectra
 			if(this.hideSpectrum[thisSpec]) continue;
 
-			//Find the maximum X value from the size of the data
-			this.XaxisLimitAbsMax = Math.max(this.XaxisLimitAbsMax, this.plotBuffer[thisSpec].length);
+			//Find the maximum X value from the size of the data, accounting for xmin offset
+			var xOff = this.spectrumXmin[thisSpec] || 0;
+			this.XaxisLimitAbsMax = Math.max(this.XaxisLimitAbsMax, xOff + this.plotBuffer[thisSpec].length);
 
 			// Zero this buffer that will be tested
+			var sliceStart = Math.max(0, Math.floor(this.XaxisLimitMin) - xOff);
+			var sliceEnd   = Math.max(0, Math.floor(this.XaxisLimitMax) - xOff);
 			thisBuffer = [];
-			thisBuffer = this.plotBuffer[thisSpec].slice(Math.floor(this.XaxisLimitMin),Math.floor(this.XaxisLimitMax));
+			thisBuffer = this.plotBuffer[thisSpec].slice(sliceStart, sliceEnd);
 
 			// Check if there is a baseline associated with this spectrum
 			if(typeof(this.baselines[thisSpec]) != 'undefined'){
 				for(i=0; i<thisBuffer.length; i++){
-					thisBuffer[i] = this.plotBuffer[thisSpec][Math.floor(this.XaxisLimitMin)+i] - this.baselines[thisSpec][Math.floor(this.XaxisLimitMin)+i];
+					thisBuffer[i] = this.plotBuffer[thisSpec][sliceStart+i] - this.baselines[thisSpec][sliceStart+i];
 				}
 			}
 
@@ -608,6 +615,9 @@ function spectrumViewer(canvasID){
 		//keep track of min and max y in a convenient place
 		this.minY = minYvalue;
 		this.maxY = maxYvalue;
+
+		//fallback when no spectra are loaded
+		if(this.XaxisLimitAbsMax === 0) this.XaxisLimitAbsMax = 2048;
 
 		//use demand overrides if present:
 		if(typeof this.demandXmin === 'number') this.XaxisLimitMin = this.demandXmin;
@@ -1365,15 +1375,21 @@ function spectrumViewer(canvasID){
 
 	//add a data series to the list to be plotted with key name and content [data]
 	//if such a series already exists, just update its data.
-	this.addData = function(name, data){
+	//xmin: physical x value of bin 0 (optional, defaults to 0 for standard histograms)
+	this.addData = function(name, data, xmin){
 		var nSeries, i;
 		//data = this.fakeData.energydata0 //fake for testing
 		//dump fits
 		this.clearFits();
 
+		var prevXmin = this.spectrumXmin[name] || 0;
+		this.spectrumXmin[name] = (typeof xmin === 'number') ? xmin : 0;
+
 		//if a series with this name already exists, just update the data
 		if(this.plotBuffer[name]){
 			this.plotBuffer[name] = data;
+			//if xmin changed (e.g. first real data arriving after dummy [0] add), recalculate axis
+			if(this.spectrumXmin[name] !== prevXmin) this.adjustXaxis();
 			return;
 		}
 
@@ -1396,6 +1412,7 @@ function spectrumViewer(canvasID){
 
 		//append the data to the data buffer
 		this.plotBuffer[name] = data;
+		this.adjustXaxis();
 	};
 
 	//remove a data series from the buffer
