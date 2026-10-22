@@ -2477,7 +2477,9 @@ async function createNewProjection(axis,min,max,BG1SF,BG1Min,BG1Max,BG2SF,BG2Min
     }
 
     // Add this background-subtracted projection to the rawData storage for plotting
-    dataStore.rawData[plotName] = subtractedHistogram;
+    dataStore.rawData[plotName] = { "data" : subtractedHistogram };
+    console.log("createdProjection " + JSON.stringify(dataStore.rawData[plotName]));
+    //dataStore.rawData[plotName] = subtractedHistogram;
 
     // Remove these items from the BG1 and BG2 objects so they are not subtracted in gammaSpectrum
     delete dataStore.createdBG1Spectra[plotName];
@@ -2730,9 +2732,11 @@ function fitSpectra(spectrum,peaks,detectorType,limits){
   //locate the spectrum in the dataStore
   if(spectrum in dataStore.createdSpectra){ // true if spectrum is a key of createdSpectra
     //set up the spectrum data for fitting
+      //LEE why stringify and then parse?
     dataStore.viewers[viewerName].addData(spectrum, JSON.parse(JSON.stringify(dataStore.createdSpectra[spectrum])) );
   }else if(spectrum in dataStore.rawData){
     //set up the spectrum data for fitting
+      //LEE why stringify and then parse?
     dataStore.viewers[viewerName].addData(spectrum, JSON.parse(JSON.stringify(dataStore.rawData[spectrum])) );
   }else{
     console.log("Failed to locate spectrum data for \'"+spectrum+"\' in fitSpectra");
@@ -3083,7 +3087,7 @@ function fitCOMSpectra(spectrum,peaks){
   //locate the spectrum in the dataStore
   if(spectrum in dataStore.createdSpectra){ // true if spectrum is a key of createdSpectra
     //set up the spectrum data for fitting
-    spectrumData = JSON.parse(JSON.stringify(dataStore.createdSpectra[spectrum]));
+    spectrumData = JSON.parse(JSON.stringify(dataStore.createdSpectra[spectrum].data));
   }else if(spectrum in dataStore.rawData){
     //set up the spectrum data for fitting
     spectrumData = JSON.parse(JSON.stringify(dataStore.rawData[spectrum]));
@@ -3971,6 +3975,7 @@ function projectXaxis(gateMin,gateMax,type,parentPlotname){
   }
   gateMin = Number(gateMin);
   gateMax = Number(gateMax);
+    console.log("projectXaxis " + gateMin + " " + gateMax + " " + type + " [" + parentPlotname + "] [" + thisProjectionName + "]");
 
   var gateLength = gateMax-gateMin;
   var thisProjection = [];
@@ -3997,7 +4002,8 @@ function projectXaxis(gateMin,gateMax,type,parentPlotname){
   }else if(type == 'BG2'){
     dataStore.createdBG2Spectra[parentPlotname] = thisProjection;
   }else{
-    dataStore.createdSpectra[thisProjectionName] = thisProjection;
+      dataStore.createdSpectra[thisProjectionName] = { "data" : thisProjection };
+      console.log("Adding x projection " + thisProjectionName);
   }
 
   return thisProjectionName;
@@ -4045,7 +4051,7 @@ function projectYaxis(gateMin,gateMax,type,parentPlotname){
   }else if(type == 'BG2'){
     dataStore.createdBG2Spectra[parentPlotname] = thisProjection;
   }else{
-    dataStore.createdSpectra[thisProjectionName] = thisProjection;
+      dataStore.createdSpectra[thisProjectionName] = { "data" : thisProjection };
   }
 
   return thisProjectionName;
@@ -4111,7 +4117,7 @@ function projectXY(gateMinX,gateMaxX,gateMinY,gateMaxY,axis){
   }
 
   // write the created spectrum to the storage object
-  dataStore.createdSpectra[thisProjectionName] = thisProjection;
+  dataStore.createdSpectra[thisProjectionName] = { "data" : thisProjection };
 
   return thisProjectionName;
 }
